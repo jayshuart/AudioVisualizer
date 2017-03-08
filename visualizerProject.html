@@ -34,7 +34,9 @@
 		var analyserNode;
 		var canvas,ctx;
 		var maxRadius = 200;
-		var invert = false, tintRed = false, noise = false, lines = false;
+		var spinBool = false, fadeBool = false, gradientBool = false, textBool = false;
+		var vizStyle = "lines";
+		var analyser = "frequency";
 		
 		var delayAmount = 0.0;
 		var delayNode;
@@ -133,13 +135,18 @@
 			// create a new array of 8-bit integers (0-255)
 			var data = new Uint8Array(NUM_SAMPLES/2); 
 			
-			// populate the array with the frequency data
-			// notice these arrays can be passed "by reference" 
-			analyserNode.getByteFrequencyData(data);
-		
-			// OR
-			//analyserNode.getByteTimeDomainData(data); // waveform data
-			
+			// populate the array w/ data based on what type is selected
+			if(analyser == "frequency")
+			{
+				//frequency data
+				analyserNode.getByteFrequencyData(data);
+			}
+			else
+			{
+				// waveform data
+				analyserNode.getByteTimeDomainData(data); 
+			}
+
 			// DRAW!
 			ctx.clearRect(0,0,800,600);  
 			var barWidth = 4;
@@ -178,9 +185,17 @@
 				ctx.closePath();
 
                 ctx.restore();
-            
-               
-				
+			}
+
+			//EVENT LISTENERS =============================================================================================================
+			//update visualizer style select
+			document.querySelector("#styleSelect").onchange = function(e){
+				vizStyle = e.target.value;
+			}
+
+			//update analyser select (waveform of frequency)
+			document.querySelector("#analyserSelect").onchange = function(e){
+				analyser = e.target.value;
 			}
 			
 			//update cricle radius size
@@ -189,96 +204,25 @@
 			//update delay based on slider
 			document.querySelector("#delaySlider").onchange = updateDelay;
 			
-			//upadte filter checkboxes
-			document.querySelector("#tintRedCheckbox").onchange = function(e) {
-				tintRed = e.target.checked;
+			//upadte options checkboxes
+			document.querySelector("#spinCheckbox").onchange = function(e) {
+				spinBool = e.target.checked;
 			}
 			
-			document.querySelector("#noiseCheckbox").onchange = function(e) {
-				noise = e.target.checked;
+			document.querySelector("#fadeCheckbox").onchange = function(e) {
+				fadeBool = e.target.checked;
 			}
 			
-			document.querySelector("#invertCheckbox").onchange = function(e) {
-				invert = e.target.checked;
+			document.querySelector("#gradientCheckbox").onchange = function(e) {
+				gradientBool = e.target.checked;
 			}
 			
-			document.querySelector("#linesCheckbox").onchange = function(e) {
-				lines = e.target.checked;
+			document.querySelector("#textCheckbox").onchange = function(e) {
+				textBool = e.target.checked;
 			}
-			 
-			 //add filters
-			 manipulatePixels();
 		} 
 		
-		// HELPER
-		function manipulatePixels(){
-
-			// i) Get all of the rgba pixel data of the canvas by grabbing the 
-			// ImageData Object
-			// https://developer.mozilla.org/en-US/docs/Web/API/ImageData
-			var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-			// ii) imageData.data is an 8-bit typed array - values range from 0-255
-			// imageData.data contains 4 values per pixel: 4 x canvas.width x 
-			// canvas.height = 1024000 values!
-			// we’re looping through this 60 FPS - wow!
-			var data = imageData.data;
-			var length = data.length;
-			var width = imageData.width;
-
-			// iii) Iterate through each pixel
-			// we step by 4 so that we can manipulate 1 pixel per iteration
-			// data[i] is the red value
-			// data[i+1] is the green value
-			// data[i+2] is the blue value
-			// data[i+3] is the alpha value
-			for (var i = 0; i < length; i += 4){
-
-				// iv) increase red value only
-				if(tintRed){
-					// just the red channel this time
-					data[i] = data[i] + 100;
-				}
-				
-				// v) invert every color channel
-				if(invert){
-					var red = data[i], green = data[i+1], blue = data[i+2];
-					data[i] = 255 - red; // set red value
-					data[i+1] = 255 - green; // set blue value
-					data[i+2] = 255 - blue;	// set green value
-					// data[i+3] is the alpha but we’re leaving that alone
-				}
-				
-				// vi) noise
-				if (noise && Math.random() < .10){
-					data[i] = data[i +1] = data[i+2] = 128; // gray nois
-					//data[i] = data[i +1] = data[i+2] = 255; // or white noise
-					//data[i] = data[i +1] = data[i+2] = 0; // or black noise
-					data[i+3] = 255; // alpha
-				}
-				
-				// vii) draw 2-pixel lines every 50 rows
-				if (lines){
-					var row = Math.floor(i/4/width);
-
-					if (row % 50 == 0){
-						// this row
-						data[i] = data[i +1] = data[i+2] = data[i+3] = 255;
-
-						// next row
-						data[i+ (width*4)] = 
-						data[i +(width*4) + 1] = 
-						data[i + (width*4) +2] =
-						data[i + (width*4) +3] = 255;
-					}
-				}
-			}
-
-			// put the modified data back on the canvas
-			ctx.putImageData(imageData, 0, 0);
-
-		}
-
+		// HELPER METHODS ======================================================================================================
         function posAroundCircle(audioData)
         {
             //variables
@@ -336,7 +280,7 @@
 		
 		window.addEventListener("load",init);
 	}());
-		
+		//END CODE ======================================================================================================================
 	</script>
 </head>
 <body>
@@ -365,14 +309,29 @@
 		
 		<button id="fsButton">Go Full Screen</button><br>
 		
-		<div id = "filters">
+		<div id = "Options">
 			<label> Filters:
-				<label>Invert <input type="checkbox" id="invertCheckbox"></label>
-				<label>Tint Red <input type="checkbox" id="tintRedCheckbox"></label>
-				<label>Noise <input type="checkbox" id="noiseCheckbox"></label>
-				<label>Lines <input type="checkbox" id="linesCheckbox"></label>
+				<label>Spin <input type="checkbox" id="spinCheckbox"></label>
+				<label>Fade In <input type="checkbox" id="fadeCheckbox"></label>
+				<label>Gradient <input type="checkbox" id="gradientCheckbox"></label>
+				<label>Text <input type="checkbox" id="textCheckbox"></label>
 			</label>
 		</div>
+
+		<label>Visualizer Style: 
+			<select id="styleSelect" >
+				<option value="bezier">Bezier</option>
+				<option value="circles">Cirlces</option>
+				<option value="lines">Lines</option>
+			</select>
+		</label>
+
+		<label>Analyser Node: 
+			<select id="analyserSelect" >
+				<option value="frequency">Frequency</option>
+				<option value="waveform">Waveform</option>
+			</select>
+		</label>
 		
 		<p id="status">???</p>
 	</div>
