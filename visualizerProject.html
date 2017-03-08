@@ -128,6 +128,14 @@
 		function update() { 
 			// this schedules a call to the update() method in 1/60 seconds
 			requestAnimationFrame(update);
+
+			//save current canvas
+			var image = canvas;
+			var image2 = image;
+			var image3 = image2;
+			var image4 = image3;
+
+			//update spin
 			if(spinBool){
 				rotAmount=rotAmount+((rotSpeed/60)*Math.PI);
 			}
@@ -169,10 +177,11 @@
 				{
 					//line varibles
 					var lineLength = 70;
-					var startPos = posAroundCircle((i / data.length) * 255, maxRadius - 50);
-					var endPos = posAroundCircle((i / data.length) * 255, maxRadius + ((data[i] / 255) * lineLength));
+					var startPos = posAroundCircle(((i) / data.length) * 255, maxRadius - 50);
+					var endPos = posAroundCircle(((i) / data.length) * 255, maxRadius + ((data[i] / 255) * lineLength));
 					
 					//make lines
+					ctx.save();
 					ctx.beginPath();
 					ctx.moveTo(startPos[0], startPos[1]);
 					ctx.lineTo(endPos[0], endPos[1]);
@@ -204,7 +213,7 @@
 				{
 					// circle variables
 					var circleRadius = maxRadius - ((maxRadius / 100) * 80) + ((data[i] / 255) * 10);
-					var circlePos = posAroundCircle((i / data.length) * 255, maxRadius);
+					var circlePos = posAroundCircle(i, maxRadius);
 
 					//make circle
 					ctx.beginPath();
@@ -214,7 +223,31 @@
 					//draw
 					ctx.stroke();
 				}
+
 			}
+
+			//fade checkboxes
+			if(fadeBool)
+			{
+				ctx.save(); //save before we mess with the canvas
+
+				//recenter for scaled canvas
+				var widthReCenter = (canvas.width * 0.085);
+				var heightReCenter = (canvas.height * 0.085);
+
+				ctx.scale(1.2, 1.2); //scale up
+				ctx.globalAlpha = 0.25; //decrease alpha
+
+				//draw fades
+				ctx.drawImage(image, 0 - widthReCenter, 0 - heightReCenter);
+				ctx.drawImage(image2, 0 - widthReCenter, 0 - heightReCenter);
+				ctx.drawImage(image3, 0 - widthReCenter, 0 - heightReCenter);
+				ctx.drawImage(image4, 0 - widthReCenter, 0 - heightReCenter);
+
+				//restore original canvas settings
+				ctx.restore();
+			}
+			
 
 			//EVENT LISTENERS =============================================================================================================
 			//update visualizer style select
@@ -338,7 +371,7 @@
 		<div id = "Options">
 			<label> Filters:
 				<label>Spin <input type="checkbox" id="spinCheckbox"></label>
-				<label>Fade In <input type="checkbox" id="fadeCheckbox"></label>
+				<label>Fade <input type="checkbox" id="fadeCheckbox"></label>
 				<label>Gradient <input type="checkbox" id="gradientCheckbox"></label>
 				<label>Text <input type="checkbox" id="textCheckbox"></label>
 			</label>
