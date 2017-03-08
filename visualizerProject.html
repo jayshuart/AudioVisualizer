@@ -44,6 +44,7 @@
 		var rotAmount =0;
 		var rotSpeed = .125;
 		var bezierSize = 4;
+
 		function init(){
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
@@ -168,7 +169,7 @@
 				{
 					//line varibles
 					var lineLength = 70;
-					var startPos = posAroundCircle((i / data.length) * 255, maxRadius - lineLength);
+					var startPos = posAroundCircle((i / data.length) * 255, maxRadius - 50);
 					var endPos = posAroundCircle((i / data.length) * 255, maxRadius + ((data[i] / 255) * lineLength));
 					
 					//make lines
@@ -226,11 +227,7 @@
 				analyser = e.target.value;
 			}
 			
-			//update cricle radius size
-			document.querySelector("#radiusSlider").onchange = updateRadius;
-			
-			//update delay based on slider
-			document.querySelector("#delaySlider").onchange = updateDelay;
+			//update sliders
 			document.querySelector("#spinSlider").onchange = updateSpin;
 			document.querySelector("#bezSlider").onchange = updateBez;
 
@@ -270,29 +267,18 @@
             return pos;
         }
 		
-		function updateRadius(e)
-		{
-			 document.querySelector("#radiusValue").innerHTML = e.target.value;
-			 maxRadius = e.target.value;
-		 }
-		 
-		 function updateDelay(e)
-		{
-			 document.querySelector("#delayValue").innerHTML = e.target.value;
-			 delayAmount = e.target.value;
-			 delayNode.delayTime.value = delayAmount;
-		 }
  		function updateSpin(e)
 		{
 			document.querySelector("#rotValue").innerHTML = (e.target.value)*200;
 			rotSpeed = e.target.value;
 		}
+
  		function updateBez(e)
 		{
 			document.querySelector("#bezVal").innerHTML = (e.target.value);
 			bezierSize = e.target.value;
-			console.log(bezierSize);
 		}
+
 		function makeColor(red, green, blue, alpha){
    			var color='rgba('+red+','+green+','+blue+', '+alpha+')';
    			return color;
@@ -334,28 +320,19 @@
 				<option value="media/Somewhere Sunny.mp3">Somewhere Sunny</option>
 			</select>
 		</label>
-		
-		<div id = "radiusSlider">
-			<label for="Circle Radius">Circle Radius</label>
-			<input id="radius" type ="range" min ="0" max="300" step ="1" value ="100"/>
-			<span style="float:right" id="radiusValue">200</span>
-		</div>
-		
-		<div id = "delaySlider">
-			<label for="Delay Slider">Delay Slider</label>
-			<input id="delay" type ="range" min ="0.0" max="1.0" step ="0.1" value ="0"/>
-			<span style="float:right" id="delayValue">0</span>
-		</div>
+
 		<div id = "spinSlider">
 			<label for="Spin Slider">Spin Slider</label>
 			<input id="spin" type ="range" min ="0.0125" max=".5" step ="0.0125" value =".125"/>
 			<span style="float:right" id="rotValue">.125</span>
 		</div>
+
 		<div id = "bezSlider">
 			<label for="Bez Slider">Bezier Slider</label>
 			<input id="bez" type ="range" min ="2" max="20" step ="1" value ="4"/>
 			<span style="float:right" id="bezVal">4</span>
 		</div>
+
 		<button id="fsButton">Go Full Screen</button><br>
 		
 		<div id = "Options">
