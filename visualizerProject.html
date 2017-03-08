@@ -45,6 +45,8 @@
 		var rotSpeed = .125;
 		var bezierSize = 4;
 
+		var grad;
+
 		function init(){
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
@@ -169,8 +171,27 @@
 			
 			// loop through the data and draw!
 			for(var i=0; i<data.length; i++) { 
-				//set stroke anf ill styles
-				ctx.strokeStyle = 'rgba(0,255,0,0.6)'; 
+				//set stroke style
+				if(gradientBool)
+				{
+					//define gradient
+					var grad = ctx.createRadialGradient((canvas.width / 2), (canvas.height / 2), (maxRadius - (maxRadius / 2)), (canvas.width / 2), (canvas.height / 2), (maxRadius + (maxRadius / 2)));
+					grad.addColorStop(0, 'purple');
+					grad.addColorStop(1 / 6, 'blue');
+					grad.addColorStop(2 / 6, 'aqua');
+					grad.addColorStop(3 / 6, 'green');
+					grad.addColorStop(4 / 6, 'yellow');
+					grad.addColorStop(5 / 6, 'orange');
+					grad.addColorStop(1, 'red');
+
+					ctx.strokeStyle = grad;
+				}
+				else
+				{
+					//no gradient - just purple
+					ctx.strokeStyle = 'purple';
+				}
+				 
 
 				//draw based on viz style selected
 				if(vizStyle == "lines") //lines 
@@ -213,7 +234,7 @@
 				{
 					// circle variables
 					var circleRadius = maxRadius - ((maxRadius / 100) * 80) + ((data[i] / 255) * 10);
-					var circlePos = posAroundCircle(i, maxRadius);
+					var circlePos = posAroundCircle(((i) / data.length) * 255, maxRadius);
 
 					//make circle
 					ctx.beginPath();
