@@ -33,7 +33,7 @@
 		var audioElement;
 		var analyserNode;
 		var canvas,ctx;
-		var maxRadius = 200;
+		var maxRadius = 100;
 		var spinBool = false, fadeBool = false, gradientBool = false, textBool = false;
 		var vizStyle = "lines";
 		var analyser = "frequency";
@@ -156,35 +156,58 @@
 			
 			// loop through the data and draw!
 			for(var i=0; i<data.length; i++) { 
+				//set stroke anf ill styles
 				ctx.strokeStyle = 'rgba(0,255,0,0.6)'; 
-				
-				// the higher the amplitude of the sample (bin) the taller the bar
-				// remember we have to draw our bars left-to-right and top-down
-				//ctx.fillRect(i * (barWidth + barSpacing),topSpacing + 256-data[i],barWidth,barHeight);
-				
-				//draw lines
-				ctx.beginPath();
-				ctx.moveTo(i * (barWidth + barSpacing), topSpacing + 256 - data[i]);
-				ctx.lineTo(i * (barWidth + barSpacing), topSpacing + 256 - data[i] + (barHeight - i));
-				ctx.closePath();
-				ctx.stroke();
-                ctx.save();
-				
-				// circle variables
-				var percent = data[i] / 255;
-				var circleRadius = percent * maxRadius;
 
+				//draw based on viz style selected
+				if(vizStyle == "lines") //lines 
+				{
+					//line varibles
+					var lineLength = 70;
+					var startPos = posAroundCircle((i / data.length) * 255, maxRadius - lineLength);
+					var endPos = posAroundCircle((i / data.length) * 255, maxRadius + ((data[i] / 255) * lineLength));
 
-                var specialPos = posAroundCircle(data[i]); //returns xy pos
+					//make lines
+					ctx.beginPath();
+					ctx.moveTo(startPos[0], startPos[1]);
+					ctx.lineTo(endPos[0], endPos[1]);
+					ctx.closePath();
 
-                //make circle
-                ctx.beginPath();
-				ctx.fillStyle= makeColor(0, 0, 255, .10 - percent/3.0 );
-				ctx.arc(specialPos[0], specialPos[1], circleRadius, 0, 2 * Math.PI, false);
-				ctx.fill();
-				ctx.closePath();
+					//draw
+					ctx.stroke();
+				}
+				else if(vizStyle == "bezier") //bezier
+				{
+					//bezier variables
+					var lineLength = 70;
+					var startPos = posAroundCircle((i / data.length) * 255, maxRadius - lineLength);
+					var cntrlPointOne;
+					var cntrlPointTwo;
+					var endPos = posAroundCircle((i / data.length) * 255, maxRadius + ((data[i] / 255) * lineLength));
 
-                ctx.restore();
+					//make bezier
+					ctx.beginPath();
+					ctx.moveTo(startPos[0], startPos[1]);
+					ctx.bezierCurveTo(cntrlPointOne[0], cntrlPointOne[1], cntrlPointTwo[0], cntrlPointTwo[1], endPos[0], endPos[1]);
+					ctx.closePath();
+
+					//draw
+					ctx.stroke();
+				}
+				else //circles
+				{
+					// circle variables
+					var circleRadius = maxRadius - ((maxRadius / 100) * 80) + ((data[i] / 255) * 10);
+					var circlePos = posAroundCircle((i / data.length) * 255, maxRadius);
+
+					//make circle
+					ctx.beginPath();
+					ctx.arc(circlePos[0], circlePos[1], circleRadius, 0, 2 * Math.PI, false);
+					ctx.closePath();
+
+					//draw
+					ctx.stroke();
+				}
 			}
 
 			//EVENT LISTENERS =============================================================================================================
@@ -223,11 +246,10 @@
 		} 
 		
 		// HELPER METHODS ======================================================================================================
-        function posAroundCircle(audioData)
+        function posAroundCircle(audioData, radius)
         {
             //variables
             var xpos, ypos;
-			var radius = 200;
 			var step = (2 * Math.PI) / 255;
 			var angle =  audioData * step;
 
@@ -297,7 +319,7 @@
 		
 		<div id = "radiusSlider">
 			<label for="Circle Radius">Circle Radius</label>
-			<input id="radius" type ="range" min ="0" max="300" step ="1" value ="200"/>
+			<input id="radius" type ="range" min ="0" max="300" step ="1" value ="100"/>
 			<span style="float:right" id="radiusValue">200</span>
 		</div>
 		
@@ -320,9 +342,9 @@
 
 		<label>Visualizer Style: 
 			<select id="styleSelect" >
+				<option value="lines">Lines</option>
 				<option value="bezier">Bezier</option>
 				<option value="circles">Cirlces</option>
-				<option value="lines">Lines</option>
 			</select>
 		</label>
 
