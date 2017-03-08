@@ -215,11 +215,11 @@
 				{
 					//bezier variables
 					var lineLength = 70;
-					var startPos = posAroundCircle(((i-(1*bezierSize)) / data.length) * 255, (maxRadius - lineLength));
+					var startPos = posAroundCircle(((i-(1*bezierSize)) / data.length) * 255, (maxRadius / 2));
 
-					var cntrlPointOne = posAroundCircle(((i) / data.length) * 255, maxRadius + ((data[i] / 255) * lineLength));
+					var cntrlPointOne = posAroundCircle(((i) / data.length) * 255, maxRadius + ((data[i] / 255) * (lineLength * 2)));
 
-					var endPos = posAroundCircle(((i+(1*bezierSize)) / data.length) * 255, (maxRadius - lineLength));
+					var endPos = posAroundCircle(((i+(1*bezierSize)) / data.length) * 255, (maxRadius / 2));
 
 					//make bezier
 					ctx.beginPath();
