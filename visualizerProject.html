@@ -164,10 +164,6 @@
 
 			// DRAW!
 			ctx.clearRect(0,0,800,600);  
-			var barWidth = 4;
-			var barSpacing = 1;
-			var barHeight = 100;
-			var topSpacing = 50;
 			
 			// loop through the data and draw!
 			for(var i=0; i<data.length; i++) { 
@@ -185,11 +181,13 @@
 					grad.addColorStop(1, 'red');
 
 					ctx.strokeStyle = grad;
+					ctx.fillStyle = grad;
 				}
 				else
 				{
 					//no gradient - just purple
 					ctx.strokeStyle = 'purple';
+					ctx.fillStyle = 'purple';
 				}
 				 
 
@@ -230,7 +228,7 @@
 					//draw
 					ctx.stroke();
 				}
-				else //circles
+				else if(vizStyle == "circles")
 				{
 					// circle variables
 					var circleRadius = maxRadius - ((maxRadius / 100) * 80) + ((data[i] / 255) * 10);
@@ -266,6 +264,21 @@
 				ctx.drawImage(image4, 0 - widthReCenter, 0 - heightReCenter);
 
 				//restore original canvas settings
+				ctx.restore();
+			}
+
+			//text chockbox
+			if(textBool)
+			{
+				ctx.save();
+
+				//text variables
+				ctx.font = "20px Arial";
+				var song = document.querySelector('#status').innerHTML;
+
+				//draw text
+				ctx.fillText(song, 10, canvas.height - 10);
+
 				ctx.restore();
 			}
 			
@@ -320,7 +333,7 @@
             var pos = [xpos, ypos];
             return pos;
         }
-		
+
  		function updateSpin(e)
 		{
 			document.querySelector("#rotValue").innerHTML = (e.target.value)*200;
@@ -376,7 +389,7 @@
 		</label>
 
 		<div id = "spinSlider">
-			<label for="Spin Slider">Spin Slider</label>
+			<label for="Spin Slider">Spin Speed</label>
 			<input id="spin" type ="range" min ="0.0125" max=".5" step ="0.0125" value =".125"/>
 			<span style="float:right" id="rotValue">.125</span>
 		</div>
@@ -390,7 +403,7 @@
 		<button id="fsButton">Go Full Screen</button><br>
 		
 		<div id = "Options">
-			<label> Filters:
+			<label> options:
 				<label>Spin <input type="checkbox" id="spinCheckbox"></label>
 				<label>Fade <input type="checkbox" id="fadeCheckbox"></label>
 				<label>Gradient <input type="checkbox" id="gradientCheckbox"></label>
