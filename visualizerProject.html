@@ -46,7 +46,8 @@
 		var bezierSize = 4;
 
 		var grad;
-
+		var fadeArray=[];
+		var fadeAmount=4;
 		function init(){
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
@@ -132,10 +133,13 @@
 			requestAnimationFrame(update);
 
 			//save current canvas
-			var image = canvas;
-			var image2 = image;
-			var image3 = image2;
-			var image4 = image3;
+			fadeArray[0]=canvas;
+			for(var i=1;i<fadeAmount;i++){
+				fadeArray[i]=fadeArray[0];
+			}
+			//var image2 = image;
+			//var image3 = image2;
+			//var image4 = image3;
 
 			//update spin
 			if(spinBool){
@@ -212,7 +216,7 @@
 				else if(vizStyle == "bezier") //bezier
 				{
 					//bezier variables
-					var lineLength = 70;
+					var lineLength = 170;
 					var startPos = posAroundCircle(((i-(1*bezierSize)) / data.length) * 255, (maxRadius / 2));
 
 					var cntrlPointOne = posAroundCircle(((i) / data.length) * 255, maxRadius + ((data[i] / 255) * (lineLength * 2)));
@@ -248,23 +252,32 @@
 			//fade checkboxes
 			if(fadeBool)
 			{
-				ctx.save(); //save before we mess with the canvas
+				 //save before we mess with the canvas
 
 				//recenter for scaled canvas
-				var widthReCenter = (canvas.width * 0.085);
+				var widthReCenter = (canvas.width * 0.1);
 				var heightReCenter = (canvas.height * 0.085);
+				var prevwidth = canvas.width;
+				var prevheight = canvas.height;
+				for(var i=0;i<fadeAmount;i++){
+					ctx.save();
+					ctx.scale(Math.pow(1.2,i), Math.pow(1.2,i)); //scale up
+					prevwidth = prevwidth * Math.pow(1.2, i-1);
+					prevheight = prevheight * Math.pow(1.2, i-1);
 
-				ctx.scale(1.2, 1.2); //scale up
-				ctx.globalAlpha = 0.25; //decrease alpha
-
-				//draw fades
-				ctx.drawImage(image, 0 - widthReCenter, 0 - heightReCenter);
+					ctx.globalAlpha =(1/(1*fadeAmount))*i; //decrease alpha
+					console.log(ctx.globalAlpha);
+					//draw fades
+					ctx.drawImage(fadeArray[i],0-((prevwidth)/(widthReCenter*.1085)),0-((prevheight)/(heightReCenter*(.085 * i))));
+					ctx.restore();
+				}
+				/*ctx.drawImage(image, 0 - widthReCenter, 0 - heightReCenter);
 				ctx.drawImage(image2, 0 - widthReCenter, 0 - heightReCenter);
 				ctx.drawImage(image3, 0 - widthReCenter, 0 - heightReCenter);
 				ctx.drawImage(image4, 0 - widthReCenter, 0 - heightReCenter);
-
+*/
 				//restore original canvas settings
-				ctx.restore();
+				
 			}
 
 			//text chockbox
@@ -297,7 +310,7 @@
 			//update sliders
 			document.querySelector("#spinSlider").onchange = updateSpin;
 			document.querySelector("#bezSlider").onchange = updateBez;
-
+			document.querySelector("#fadeSlider").onchange = updateFade;
 			//upadte options checkboxes
 			document.querySelector("#spinCheckbox").onchange = function(e) {
 				spinBool = e.target.checked;
@@ -345,7 +358,11 @@
 			document.querySelector("#bezVal").innerHTML = (e.target.value);
 			bezierSize = e.target.value;
 		}
-
+ 		function updateFade(e)
+		{
+			document.querySelector("#fadeAmount_").innerHTML = (e.target.value);
+			fadeAmount = e.target.value;
+		}
 		function makeColor(red, green, blue, alpha){
    			var color='rgba('+red+','+green+','+blue+', '+alpha+')';
    			return color;
@@ -399,7 +416,11 @@
 			<input id="bez" type ="range" min ="2" max="20" step ="1" value ="4"/>
 			<span style="float:right" id="bezVal">4</span>
 		</div>
-
+<div id = "fadeSlider">
+			<label for="Fade Slider">Fade Slider</label>
+			<input id="fadeSlide" type ="range" min ="2" max="20" step ="1" value ="4"/>
+			<span style="float:right" id="fadeAmount_">4</span>
+		</div>
 		<button id="fsButton">Go Full Screen</button><br>
 		
 		<div id = "Options">
