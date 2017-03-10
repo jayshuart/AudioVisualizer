@@ -54,7 +54,7 @@
 
 		var grad;
 		var fadeArray=[];
-		var fadeAmount=15;
+		var fadeAmount=4;
 		function init(){
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
@@ -226,14 +226,19 @@
 				{
 					//line varibles
 					var lineLength = 70;
-					var startPos = posAroundCircle(((i) / data.length) * 255, maxRadius - 50);
-					var endPos = posAroundCircle(((i) / data.length) * 255, maxRadius + ((data[i] / 255) * lineLength));
+					var startPos = posAroundCircle(i, maxRadius - 50);
+					var endPos = posAroundCircle(i, maxRadius + ((data[i] / 255) * lineLength));
+					var startMirror = posAroundCircle(i * -1, maxRadius - 50);
+					var endMirror = posAroundCircle(i * -1, maxRadius + ((data[i] / 255) * lineLength));
+					
 					
 					//make lines
 					ctx.save();
 					ctx.beginPath();
 					ctx.moveTo(startPos[0], startPos[1]);
 					ctx.lineTo(endPos[0], endPos[1]);
+					ctx.moveTo(startMirror[0], startMirror[1]);
+					ctx.lineTo(endMirror[0], endMirror[1]);
 					ctx.closePath();
 
 					//draw
@@ -243,16 +248,20 @@
 				{
 					//bezier variables
 					var lineLength = 170;
-					var startPos = posAroundCircle(((i-(1*bezierSize)) / data.length) * 255, (maxRadius / 2));
 
-					var cntrlPointOne = posAroundCircle(((i) / data.length) * 255, maxRadius + ((data[i] / 255) * (lineLength * 2)));
+					var startPos = posAroundCircle(i-(1*bezierSize), (maxRadius / 2));
+					var cntrlPointOne = posAroundCircle(i, maxRadius + ((data[i] / 255) * (lineLength * 2)));
+					var endPos = posAroundCircle(i+(1*bezierSize), (maxRadius / 2));
 
-					var endPos = posAroundCircle(((i+(1*bezierSize)) / data.length) * 255, (maxRadius / 2));
+					var startMirror = posAroundCircle((i-(1*bezierSize)) * -1, (maxRadius / 2));
+					var cntrlPointMirror = posAroundCircle(i * -1, maxRadius + ((data[i] / 255) * (lineLength * 2)));
+					var endMirror = posAroundCircle((i+(1*bezierSize)) * -1, (maxRadius / 2));
 
 					//make bezier
 					ctx.beginPath();
-					ctx.moveTo(startPos[0], startPos[1]);
 					ctx.bezierCurveTo(startPos[0], startPos[1], cntrlPointOne[0], cntrlPointOne[1], endPos[0], endPos[1]);
+					ctx.moveTo(startMirror[0], startMirror[1]);
+					ctx.bezierCurveTo(startMirror[0], startMirror[1], cntrlPointMirror[0], cntrlPointMirror[1], endMirror[0], endMirror[1]);
 					ctx.closePath();
 
 					//draw
@@ -262,7 +271,8 @@
 				{
 					// circle variables
 					var circleRadius = maxRadius - ((maxRadius / 100) * 80) + ((data[i] / 255) * 10);
-					var circlePos = posAroundCircle(((i) / data.length) * 255, maxRadius);
+					var circlePos = posAroundCircle(i, maxRadius);
+					var circleMirror = posAroundCircle(i * -1, maxRadius);
 
 					//make circle
 					ctx.beginPath();
@@ -270,6 +280,14 @@
 					ctx.closePath();
 
 					//draw
+					ctx.stroke();
+
+					//make mirror circle
+					ctx.beginPath();
+					ctx.arc(circleMirror[0], circleMirror[1], circleRadius, 0, 2 * Math.PI, false);
+					ctx.closePath();
+
+					//draw mirror
 					ctx.stroke();
 				}
 
@@ -293,15 +311,10 @@
 					prevheight = prevheight * Math.pow(1.2, i-1);
 
 					ctx.globalAlpha =(1/(2*(1*fadeAmount)))*i; //decrease alpha
-					console.log(ctx.globalAlpha);
+
 					//draw fades
 					ctx.drawImage(fadeArray[i],0-(widthReCenter),0-(heightReCenter));//(prevwidth)/(widthReCenter*.1085)),0-((prevheight)/(heightReCenter*(.085 * i))));
 				}
-				/*ctx.drawImage(image, 0 - widthReCenter, 0 - heightReCenter);
-				ctx.drawImage(image2, 0 - widthReCenter, 0 - heightReCenter);
-				ctx.drawImage(image3, 0 - widthReCenter, 0 - heightReCenter);
-				ctx.drawImage(image4, 0 - widthReCenter, 0 - heightReCenter);
-*/
 				//restore original canvas settings
 				ctx.restore();
 
