@@ -41,6 +41,13 @@
 		var delayAmount = 0.0;
 		var delayNode;
 		
+		//Bass and Treb Boosts
+		var boostBAmount = 0.0;
+		var boostBNode;
+		var boostTAmount = 0.0;
+		var boostTNode;
+
+
 		var rotAmount =0;
 		var rotSpeed = .125;
 		var bezierSize = 4;
@@ -100,8 +107,23 @@
 			delayNode = audioCtx.createDelay();
 			delayNode.delayTime.value = delayAmount;
 			
+			//BassFilter
+			boostBNode= audioCtx.createBiquadFilter();
+			boostBNode.type="lowshelf";
+			boostBNode.frequency.value=200;
+			boostBNode.gain.value=boostBAmount;
+			sourceNode.connect(boostBNode);
+
+			//Treb
+			boostTNode= audioCtx.createBiquadFilter();
+			boostTNode.type="highshelf";
+			boostTNode.frequency.value=2000;
+			boostTNode.gain.value=boostTAmount;
+			boostBNode.connect(boostTNode);
 			// here we connect to the destination i.e. speakers
-			sourceNode.connect(audioCtx.destination); //unaltered source in this channel
+			//sourceNode.connect(audioCtx.destination); 
+			boostTNode.connect(audioCtx.destination);
+			//unaltered source in this channel
 			
 			//another channelt o play and visualize the delay
 			sourceNode.connect(delayNode);
@@ -131,6 +153,10 @@
 		function update() { 
 			// this schedules a call to the update() method in 1/60 seconds
 			requestAnimationFrame(update);
+			
+			//Bass and Treb amounts update
+			boostBNode.gain.value=boostBAmount;
+			boostTNode.gain.value=boostTAmount;
 
 			//save current canvas
 			fadeArray[0]=canvas;
@@ -312,6 +338,8 @@
 			document.querySelector("#spinSlider").onchange = updateSpin;
 			document.querySelector("#bezSlider").onchange = updateBez;
 			document.querySelector("#fadeSlider").onchange = updateFade;
+			document.querySelector("#bassSlider").onchange = updateBass;
+			document.querySelector("#trebSlider").onchange = updateTreb;
 			//upadte options checkboxes
 			document.querySelector("#spinCheckbox").onchange = function(e) {
 				spinBool = e.target.checked;
@@ -363,6 +391,16 @@
 		{
 			document.querySelector("#fadeAmount_").innerHTML = (e.target.value);
 			fadeAmount = e.target.value;
+		}
+		function updateBass(e)
+		{
+			document.querySelector("#bassAmount").innerHTML = (e.target.value);
+			boostBAmount = e.target.value;
+		}
+		function updateTreb(e)
+		{
+			document.querySelector("#trebAmount").innerHTML = (e.target.value);
+			boostTAmount = e.target.value;
 		}
 		function makeColor(red, green, blue, alpha){
    			var color='rgba('+red+','+green+','+blue+', '+alpha+')';
@@ -417,10 +455,21 @@
 			<input id="bez" type ="range" min ="2" max="20" step ="1" value ="4"/>
 			<span style="float:right" id="bezVal">4</span>
 		</div>
-<div id = "fadeSlider">
+		<div id = "fadeSlider">
 			<label for="Fade Slider">Fade Slider</label>
 			<input id="fadeSlide" type ="range" min ="2" max="20" step ="1" value ="4"/>
 			<span style="float:right" id="fadeAmount_">4</span>
+		</div>
+
+		<div id = "bassSlider">
+			<label for="Bass Slider">Bass Slider</label>
+			<input id="bassSlide" type ="range" min ="0" max="50" step ="1" value ="0"/>
+			<span style="float:right" id="bassAmount">0</span>
+		</div>
+		<div id = "trebSlider">
+			<label for="Treb Slider">Treb Slider</label>
+			<input id="TrebSlide" type ="range" min ="0" max="50" step ="1" value ="0"/>
+			<span style="float:right" id="trebAmount">0</span>
 		</div>
 		<button id="fsButton">Go Full Screen</button><br>
 		
