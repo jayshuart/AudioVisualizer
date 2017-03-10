@@ -47,7 +47,7 @@
 
 		var grad;
 		var fadeArray=[];
-		var fadeAmount=4;
+		var fadeAmount=15;
 		function init(){
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
@@ -253,23 +253,23 @@
 			if(fadeBool)
 			{
 				 //save before we mess with the canvas
+				ctx.save();
 
 				//recenter for scaled canvas
-				var widthReCenter = (canvas.width * 0.1);
-				var heightReCenter = (canvas.height * 0.085);
+				var widthReCenter = (canvas.width * 0.084);
+				var heightReCenter = (canvas.height * 0.084);
 				var prevwidth = canvas.width;
 				var prevheight = canvas.height;
+				//ctx.scale(Math.pow(1.2,i), Math.pow(1.2,i)); //scale up
+				ctx.scale(1.2,1.2);
 				for(var i=0;i<fadeAmount;i++){
-					ctx.save();
-					ctx.scale(Math.pow(1.2,i), Math.pow(1.2,i)); //scale up
 					prevwidth = prevwidth * Math.pow(1.2, i-1);
 					prevheight = prevheight * Math.pow(1.2, i-1);
 
-					ctx.globalAlpha =(1/(1*fadeAmount))*i; //decrease alpha
+					ctx.globalAlpha =(1/(2*(1*fadeAmount)))*i; //decrease alpha
 					console.log(ctx.globalAlpha);
 					//draw fades
-					ctx.drawImage(fadeArray[i],0-((prevwidth)/(widthReCenter*.1085)),0-((prevheight)/(heightReCenter*(.085 * i))));
-					ctx.restore();
+					ctx.drawImage(fadeArray[i],0-(widthReCenter),0-(heightReCenter));//(prevwidth)/(widthReCenter*.1085)),0-((prevheight)/(heightReCenter*(.085 * i))));
 				}
 				/*ctx.drawImage(image, 0 - widthReCenter, 0 - heightReCenter);
 				ctx.drawImage(image2, 0 - widthReCenter, 0 - heightReCenter);
@@ -277,7 +277,8 @@
 				ctx.drawImage(image4, 0 - widthReCenter, 0 - heightReCenter);
 */
 				//restore original canvas settings
-				
+				ctx.restore();
+
 			}
 
 			//text chockbox
